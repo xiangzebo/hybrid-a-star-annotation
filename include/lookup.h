@@ -85,9 +85,9 @@ inline void collisionLookup(Constants::config* lookup) {
   bool DEBUG = false;
   std::cout << "I am building the collision lookup table...";
   // cell size
-  const float cSize = Constants::cellSize;//为1
+  const float cSize = Constants::cellSize;//单位网格的实际大小
   // bounding box size length/width
-  const int size = Constants::bbSize;// 为 (车的面积+4)/cellsize
+  const int size = Constants::bbSize;// 车自身斜长为最大半斤的bounding box+2*2米膨胀
 
   struct point {//定义点的数据结构
     double x;
@@ -236,7 +236,8 @@ inline void collisionLookup(Constants::config* lookup) {
         } else {
           tMaxY = tDeltaY * (start.y - (long)start.y);
         }
-
+        
+        //这个循环做的功能是，从第一个顶点到下一个顶点占据的cSpace 进行置位
         while ((int)end.x != X || (int)end.y != Y) {
           // only increment x if the t length is smaller and the result will be closer to the goal
           if (tMaxX < tMaxY && std::abs(X + stepX - (int)end.x) < std::abs(X - (int)end.x)) {
@@ -265,6 +266,8 @@ inline void collisionLookup(Constants::config* lookup) {
       }
 
       // FILL THE SHAPE
+      //通过前面得到四个顶点附近的区域是否可同行
+      //这里是填充四个顶点内的区域
       for (int i = 0; i < size; ++i) {
         // set inside to false
         inside = false;
